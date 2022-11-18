@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script defer src="js/math.min.js"></script>
+  <script defer src="js/opencv.js"></script>
+  <script defer src="js/Live_Detection.js"></script>
+  <script defer src="js/script.js" type="module"></script>
+  <script defer src="js/poseliveness.js"></script>
+  <style>
+    canvas {
+      position: absolute;
+    }
+    #text{
+      top:20px;
+      position: absolute;
+      color:white;
+    }
+    video{
+        object-fit:fill;
+    }
+  </style>
+</head>
+<body style="font-family: monospace; background: black; color: white; font-size: 16px; line-height: 22px; margin: 0; overflow: hidden">
+  <p id="text">请调整脸部距离</p>
+ <video id="video" playsinline class="video" ></video>
+  <canvas id="canvas" class="canvas" style="position: fixed; top: 0; left: 0; z-index: 10"></canvas>
+  <div id="log" style="overflow-y: scroll; height: 16.5rem"></div>
+</body>
+</html>
