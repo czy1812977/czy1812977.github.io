@@ -61,10 +61,12 @@ function drawFaces(canvas, data, fps) {
 async function detectVideo(video, canvas) {
     if (!video || video.paused) return false;
     const t0 = performance.now();
+    faceapi.matchDimensions(canvas,{width:video.width,height:video.height})
     faceapi
         .detectSingleFace(video, optionsSSDMobileNet)
         .withFaceLandmarks()
         .then((result) => {
+            let resizedResult=faceapi.resizeResults(result,{width:video.width,height:video.height})
             const fps = 1000 / (performance.now() - t0);
             if (flag1 && isNaN(result)) {
                 video.dispatchEvent(trackSuccess);
@@ -133,7 +135,7 @@ async function detectVideo(video, canvas) {
                     }
                 }, 1000)
             }
-            drawFaces(canvas, result, fps.toLocaleString());
+            drawFaces(canvas, resizedResult, fps.toLocaleString());
             requestAnimationFrame(() => detectVideo(video, canvas));
             return true;
         })

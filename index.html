@@ -12,22 +12,21 @@
   <script defer src="js/poseliveness.js"></script>
   <style>
     canvas {
-      position: absolute;
+      position: fixed;
     }
     #text{
       top:20px;
-      position: absolute;
       color:white;
-    }
-    video{
-        object-fit:fill;
     }
   </style>
 </head>
-<body style="font-family: monospace; background: black; color: white; font-size: 16px; line-height: 22px; margin: 0; overflow: hidden">
+<body style="text-align:center;font-family: monospace; background: black; color: white; font-size: 16px; line-height: 22px; margin: 0; overflow: hidden">
   <p id="text">请调整脸部距离</p>
+  <canvas id="canvas" class="canvas" style="
+			margin: 0 auto;
+			border:1px solid red; "></canvas>
  <video id="video" playsinline class="video" ></video>
-  <canvas id="canvas" class="canvas" style="position: fixed; top: 0; left: 0; z-index: 10"></canvas>
+
   <div id="log" style="overflow-y: scroll; height: 16.5rem"></div>
 </body>
 </html>
