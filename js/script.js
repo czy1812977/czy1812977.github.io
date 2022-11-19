@@ -1,5 +1,6 @@
 const video = document.getElementById('video')
 const text = document.getElementById('text')
+const trackSuccess = new Event('trackSuccess');
 let start_flag = 0;
 let params
 let pose_index = 0
@@ -65,7 +66,6 @@ async function detectVideo(video, canvas) {
         .withFaceLandmarks()
         .then((result) => {
             const fps = 1000 / (performance.now() - t0);
-            const trackSuccess = new Event('trackSuccess');
             if (flag1 && isNaN(result)) {
                 video.dispatchEvent(trackSuccess);
                 flag1 = false
@@ -159,8 +159,8 @@ async function setupCamera() {
     }
     let stream;
     const constraints = {audio: false, video: {facingMode: 'user', resizeMode: 'crop-and-scale'}};
-    if (window.innerWidth > window.innerHeight) constraints.video.width = {ideal: window.innerWidth};
-    else constraints.video.height = {ideal: window.innerHeight};
+    if (window.innerWidth > window.innerHeight) constraints.video.width = {ideal: window.innerWidth/2};
+    else constraints.video.height = {ideal: window.innerHeight/2};
     try {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
     } catch (err) {
