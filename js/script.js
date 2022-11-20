@@ -185,6 +185,8 @@ async function setupCamera() {
     canvas.addEventListener('click', () => {
         if (video && video.readyState >= 2) {
             if (video.paused) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
                 video.width = video.videoWidth;
                 video.height = video.videoHeight;
                 video.play();
@@ -201,6 +203,7 @@ async function setupCamera() {
             canvas.height = video.videoHeight;
             video.width = video.videoWidth;
             video.height = video.videoHeight;
+            canvas.style.margin="0 auto"
             video.play();
             detectVideo(video, canvas);
             resolve(true);
