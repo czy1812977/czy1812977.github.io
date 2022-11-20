@@ -40,7 +40,7 @@ function pose_detection(detection,index){
     else if(detector_list[index]===2){
         text.innerText="请眨眼睛"
         max_ear=math.max(ear,max_ear)
-        let flags=blink_detection(ear,eye_count,blink,max_ear*0.85)
+        let flags=blink_detection(ear,eye_count,blink,max_ear*0.9)
         eye_count=flags.count
         blink=flags.blink
         if(blink===1){
