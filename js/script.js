@@ -73,13 +73,13 @@ async function detectVideo(video, canvas) {
                 flag1 = false
             }
             if (start_flag === 1) {
-                if (times > 200) {
-                    alert("活体检测超时")
-                    video.dispatchEvent(Fail);
-
-                }
+                // if (times > 200) {
+                //     alert("活体检测超时")
+                //     video.dispatchEvent(Fail);
+                //
+                // }
                 if (pose_index <= 1) {
-                    pose_index = pose_detection(result.landmarks, pose_index)
+                    pose_index = pose_detection(resizedResult, pose_index)
                     times += 1
                 }
                 if (pose_index === 2) {
@@ -94,16 +94,16 @@ async function detectVideo(video, canvas) {
             }
             if (flag3 && (!flag2)) {
                 flag3 = false;
-                B_r_images = cutFaceAndEyes(result, offset, video, 'R');
-                B_g_images = cutFaceAndEyes(result, offset, video, 'G');
-                B_b_images = cutFaceAndEyes(result, offset, video, 'B');
+                B_r_images = cutFaceAndEyes(resizedResult, offset, video, 'R');
+                B_g_images = cutFaceAndEyes(resizedResult, offset, video, 'G');
+                B_b_images = cutFaceAndEyes(resizedResult, offset, video, 'B');
                 setTimeout(() => {
                     flag4 = false
                 }, 3000)
             }
             if (flag5 && (!flag4)) {
                 flag5 = false;
-                r_images = cutFaceAndEyes(result, offset, video, 'R');
+                r_images = cutFaceAndEyes(resizedResult, offset, video, 'R');
                 setTimeout(() => {
                     flag6 = false
                 }, 1000)
@@ -111,7 +111,7 @@ async function detectVideo(video, canvas) {
             }
             if (flag7 && (!flag6)) {
                 flag7 = false;
-                g_images = cutFaceAndEyes(result, offset, video, 'G');
+                g_images = cutFaceAndEyes(resizedResult, offset, video, 'G');
                 setTimeout(() => {
                     flag8 = false
                 }, 1000)
@@ -119,7 +119,7 @@ async function detectVideo(video, canvas) {
             }
             if (flag9 && (!flag8)) {
                 flag9 = false;
-                b_images = cutFaceAndEyes(result, offset, video, 'B');
+                b_images = cutFaceAndEyes(resizedResult, offset, video, 'B');
                 setTimeout(() => {
                     let score_r = runSVM(calcFeat(r_images, B_r_images),params)
                     let score_g = runSVM(calcFeat(g_images, B_g_images),params)
@@ -141,7 +141,7 @@ async function detectVideo(video, canvas) {
         })
         .catch((err) => {
             console.log(err)
-            log(`Detect Error: ${str(err)}`);
+            requestAnimationFrame(() => detectVideo(video, canvas));
             return false;
         });
     return false;
@@ -162,7 +162,7 @@ async function setupCamera() {
     let stream;
     const constraints = {audio: false, video: {facingMode: 'user', resizeMode: 'crop-and-scale'}};
     if (window.innerWidth > window.innerHeight) constraints.video.width = {ideal: window.innerWidth/2};
-    else constraints.video.height = {ideal: window.innerHeight/2};
+    else constraints.video.height = {ideal: window.innerHeight/3};
     try {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
     } catch (err) {
@@ -255,7 +255,7 @@ video.addEventListener('Fail', () => {
 })
 
 window.onload = async function () {
-    log('FaceAPI WebCam Test');
+    log('Live_Detection WebCam Test');
     await faceapi.tf.setBackend('webgl');
     await faceapi.tf.ready();
     const url = "/models/SV.json";/*json文件url，本地的就写本地的位置，如果是服务器的就写服务器的路径*/
@@ -267,7 +267,7 @@ window.onload = async function () {
             params = JSON.parse(request.responseText);
         }
     }
-    log(`Version: FaceAPI ${str(faceapi?.version || '(not loaded)')} TensorFlow/JS ${str(faceapi?.tf?.version_core || '(not loaded)')} Backend: ${str(faceapi?.tf?.getBackend() || '(not loaded)')}`);
+    // log(`Version: FaceAPI ${str(faceapi?.version || '(not loaded)')} TensorFlow/JS ${str(faceapi?.tf?.version_core || '(not loaded)')} Backend: ${str(faceapi?.tf?.getBackend() || '(not loaded)')}`);
     await setupFaceAPI();
     await setupCamera();
 }

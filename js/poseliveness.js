@@ -1,5 +1,6 @@
 let down_pose=0,left_pose=0,right_pose=0,shake_pose=0,eye_count=0,mouth_count=0,blink=0,close_pose=0
 const detector_list=create_random_list(2)
+let max_ear=0;
 function count_euclidean(point1,point2){
     return math.sqrt(math.pow((point1.x-point2.x),2)+math.pow((point1.y-point2.y),2))
 }
@@ -15,21 +16,20 @@ function create_random_list(num,list=4){
     }
     return arr;
 }
-function pose_detection(landmarks,index,width){
-    let mar=mouth_aspect_ratio(landmarks.getMouth())
-    let ear=math.evaluate((eye_aspect_ratio(landmarks.getLeftEye())+eye_aspect_ratio(landmarks.getRightEye()))/2)
-    let njd=nose_jaw_distance(landmarks.getNose(),landmarks.getJawOutline())
-    let ebd=eyebrow_jaw_distance(landmarks.getLeftEye(),landmarks.getJawOutline())
+function pose_detection(detection,index){
+    let mar=mouth_aspect_ratio(detection.landmarks.getMouth())
+    let ear=math.evaluate((eye_aspect_ratio(detection.landmarks.getLeftEye())+eye_aspect_ratio(detection.landmarks.getRightEye()))/2)
+
     if(detector_list[index]===0){
         text.innerText="请点头"
-        down_pose=nod_detection(width,ebd,down_pose)
+        down_pose=nod_detection(detection.angle.pitch,down_pose)
         if(down_pose===2){
             index+=1;
         }
     }
     else if(detector_list[index]===1){
         text.innerText="请摇头"
-        let flags=shake_detection(width,njd,left_pose,right_pose,shake_pose)
+        let flags=shake_detection(detection.angle.yaw,left_pose,right_pose,shake_pose)
         left_pose=flags.left
         right_pose=flags.right
         shake_pose=flags.shake
@@ -39,7 +39,8 @@ function pose_detection(landmarks,index,width){
     }
     else if(detector_list[index]===2){
         text.innerText="请眨眼睛"
-        let flags=blink_detection(width,ear,eye_count,blink)
+        max_ear=math.max(ear,max_ear)
+        let flags=blink_detection(ear,eye_count,blink,max_ear*0.85)
         eye_count=flags.count
         blink=flags.blink
         if(blink===1){
@@ -48,7 +49,7 @@ function pose_detection(landmarks,index,width){
     }
     else if(detector_list[index]===3){
         text.innerText="请张嘴"
-        let flags=mouth_detection(width,mar,mouth_count,close_pose)
+        let flags=mouth_detection(mar,mouth_count,close_pose)
         mouth_count=flags.count
         close_pose=flags.close
         if(close_pose===1){
@@ -73,38 +74,22 @@ function mouth_aspect_ratio(mouth){
 
 }
 
-function nose_jaw_distance(nose,jaw){
-    let face_left1=count_euclidean(nose[0],jaw[0])
-    let face_right1 = count_euclidean(nose[0], jaw[16])
-    let face_left2 = count_euclidean(nose[3], jaw[2])
-    let face_right2 = count_euclidean(nose[3], jaw[14])
-    return [face_left1,face_right1,face_left2,face_right2]
-
-}
-function eyebrow_jaw_distance(Eyebrow, jaw){
-    let eyebrow_left = count_euclidean(Eyebrow[2], jaw[0])
-    let eyebrow_right = count_euclidean(Eyebrow[2], jaw[16])
-    let left_right = count_euclidean(jaw[0], jaw[16])
-    return [eyebrow_left, eyebrow_right, left_right]
-}
-
-function nod_detection(width,ebd,down,threshold=-3.5){
-    console.log(ebd[2]-ebd[1]-ebd[0])
-    if(((ebd[2]-ebd[1]-ebd[0])>=threshold)&&down===0){
+function nod_detection(pitch,down,threshold=3.5){
+    if(((pitch)<=(-2*threshold))&&down===0){
         down+=1
     }
-    if((down!==0)&&((ebd[2]-ebd[1]-ebd[0])<=(2*threshold))){
+    if((down!==0)&&(pitch>=threshold)){
         down+=1
     }
     return down
 }
 
-function shake_detection(width,njd,left,right,shake,threshold=35){
-    console.log(njd[0]-njd[1])
-    if(((njd[0]-njd[1])>=threshold)&&((njd[2]-njd[3])>=threshold)){
+function shake_detection(yaw,left,right,shake,threshold=35){
+
+    if(yaw>threshold){
         left+=1;
     }
-    if(((njd[0]-njd[1])<=-threshold)&&((njd[2]-njd[3])<=-threshold)){
+    if(yaw<-threshold){
         right+=1;
     }
     if(left!==0&&right!==0){
@@ -113,8 +98,7 @@ function shake_detection(width,njd,left,right,shake,threshold=35){
     return{left:left,right:right,shake:shake}
 }
 
-function blink_detection(width,ear,count,blink,threshold=0.28,frame=2){
-    console.log(ear)
+function blink_detection(ear,count,blink,threshold=-0.27,frame=3){
     if( ear<threshold){
         count+=1;
     }
@@ -126,8 +110,7 @@ function blink_detection(width,ear,count,blink,threshold=0.28,frame=2){
     }
     return{count:count,blink:blink}
 }
-function mouth_detection(width,mar,count,close,threshold=0.50,frame=2){
-    console.log(mar)
+function mouth_detection(mar,count,close,threshold=0.65,frame=2){
     if( mar<threshold){
         count+=1;
     }

@@ -6,10 +6,6 @@ function cutFaceAndEyes(resizedDetection, offset, video, plane) {
     let landmarks = resizedDetection.landmarks;
     let leftEye = landmarks.getLeftEye()
     let rightEye = landmarks.getRightEye()
-    console.log(box)
-    console.log(landmarks)
-    console.log( leftEye)
-    console.log(rightEye)
     leftEye.splice(3, 1);
     leftEye.splice(0, 1);
     rightEye.splice(3, 1);
@@ -21,7 +17,6 @@ function cutFaceAndEyes(resizedDetection, offset, video, plane) {
     let left;
     let right;
     cap.read(src);
-    console.log(src)
     let rgbaPlanes = new cv.MatVector();
     cv.split(src, rgbaPlanes)
     let R = rgbaPlanes.get(0);
@@ -38,7 +33,8 @@ function cutFaceAndEyes(resizedDetection, offset, video, plane) {
         cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
         img = dst
     }
-    console.log(img)
+
+
     let FaceRect = new cv.Rect(box.x, box.y, box.width, box.height);
     let LeftRect = new cv.Rect(leftContre.x + offset[0].x, leftContre.y + offset[0].y, leftWidth, leftWidth);
     let RightRect = new cv.Rect(rightContre.x + offset[1].x, rightContre.y + offset[1].y, rightWidth, rightWidth);
